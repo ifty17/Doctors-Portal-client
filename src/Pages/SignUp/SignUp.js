@@ -22,12 +22,13 @@ const SignUp = () => {
                 const user = result.user;
                 console.log(user);
                 toast('User Created Successfully.')
-                navigate(from, { replace: true });
                 const userInfo = {
                     displayName: data.name
                 }
                 updateUser(userInfo)
-                    .then(() => { })
+                .then(() => {
+                        navigate(from, { replace: true });
+                     })
                     .catch(err => console.log(err));
             })
             .catch(error => {
