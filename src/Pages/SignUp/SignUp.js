@@ -21,13 +21,13 @@ const SignUp = () => {
             .then(result => {
                 const user = result.user;
                 console.log(user);
-                toast('User Created Successfully.')
+                toast.success('User Created Successfully.')
                 const userInfo = {
                     displayName: data.name
                 }
                 updateUser(userInfo)
                 .then(() => {
-                        navigate(from, { replace: true });
+                        saveUser(data.name, data.email);
                      })
                     .catch(err => console.log(err));
             })
@@ -35,7 +35,38 @@ const SignUp = () => {
                 console.log(error)
                 setSignUPError(error.message)
             });
+    };
+
+
+    const saveUser = (name, email) =>{
+        const user ={name, email};
+        fetch("http://localhost:5000/users", {
+            method: "POST",
+            headers:{
+                "content-type" : "application/json"
+            },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(data => {
+            getUserToken(email);
+        })
+    };
+
+    const getUserToken = email =>{
+        fetch(`http://localhost:5000/jwt?email=${email}`)
+        .then(res => res.json())
+        .then(data =>{
+            if(data.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken);
+                navigate("/");
+            }
+        })
     }
+
+
+
+
 
     return (
         <div className='h-[800px] flex justify-center items-center'>
@@ -45,7 +76,7 @@ const SignUp = () => {
                     <div className="form-control w-full max-w-xs">
                         <label className="label"> <span className="label-text">Name</span></label>
                         <input type="text" {...register("name", {
-                            required: "Name is Required"
+                            required: "Name is Required" 
                         })} className="input input-bordered w-full max-w-xs" />
                         {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
                     </div>
